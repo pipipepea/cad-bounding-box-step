@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm --prefix web_m run build",
+  "outputDirectory": "web_m/dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
