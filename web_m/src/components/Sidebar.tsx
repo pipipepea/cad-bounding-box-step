@@ -17,6 +17,7 @@ import {
   FileCode,
   FileSpreadsheet,
   RotateCcw,
+  X,
 } from 'lucide-react';
 import {
   ParsedCADModel,
@@ -52,6 +53,8 @@ interface SidebarProps {
   onExportOBJ: () => void;
   onExportGLTF: () => void;
   onExportJSON: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -78,6 +81,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onExportOBJ,
   onExportGLTF,
   onExportJSON,
+  isOpen = false,
+  onClose,
 }) => {
   const [copied, setCopied] = useState(false);
   const [showFaceList, setShowFaceList] = useState(false);
@@ -160,34 +165,53 @@ ${
   };
 
   return (
-    <aside className="w-80 sm:w-96 bg-slate-900 border-l border-slate-800 flex flex-col h-full min-h-0 min-w-0 overflow-hidden text-slate-200 z-10 shrink-0">
+    <aside
+      className={`
+        fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] max-w-full
+        lg:static lg:w-96 lg:z-10
+        bg-slate-900 border-l border-slate-800 flex flex-col h-full min-h-0 min-w-0 overflow-hidden text-slate-200 shrink-0
+        transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none
+        ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+      `}
+    >
       {/* Sidebar Header */}
-      <div className="p-4 border-b border-slate-800 bg-slate-950/40 flex items-center justify-between shrink-0">
-        <div>
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+      <div className="p-3.5 sm:p-4 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between shrink-0">
+        <div className="min-w-0 pr-2">
+          <span className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider block">
             Kết quả đo lường tự động
           </span>
-          <h2 className="text-sm font-bold text-white truncate max-w-[210px]" title={model.name}>
+          <h2 className="text-xs sm:text-sm font-bold text-white truncate max-w-[180px] sm:max-w-[210px]" title={model.name}>
             {model.name}
           </h2>
         </div>
-        <button
-          onClick={copyToClipboard}
-          className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
-          title="Sao chép toàn bộ thông số kích thước"
-        >
-          {copied ? (
-            <>
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400">Đã chép!</span>
-            </>
-          ) : (
-            <>
-              <Copy className="w-3.5 h-3.5 text-slate-300" />
-              <span>Sao chép</span>
-            </>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={copyToClipboard}
+            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+            title="Sao chép toàn bộ thông số kích thước"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400">Đã chép!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 text-slate-300" />
+                <span>Sao chép</span>
+              </>
+            )}
+          </button>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="lg:hidden p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
+              title="Đóng bảng thông số (quay lại 3D)"
+            >
+              <X className="w-4 h-4" />
+            </button>
           )}
-        </button>
+        </div>
       </div>
 
       {/* Scrollable content area */}

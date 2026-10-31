@@ -18,6 +18,8 @@ import {
   Grid,
   Ruler,
   MousePointerClick,
+  Sliders,
+  ChevronRight,
 } from 'lucide-react';
 
 interface Canvas3DProps {
@@ -31,6 +33,7 @@ interface Canvas3DProps {
   showDimensions: boolean;
   setShowDimensions: (v: boolean) => void;
   onFacePicked?: (normal: Vector3D) => void;
+  onOpenSidebar?: () => void;
 }
 
 export const Canvas3D: React.FC<Canvas3DProps> = ({
@@ -44,6 +47,7 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
   showDimensions,
   setShowDimensions,
   onFacePicked,
+  onOpenSidebar,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -402,47 +406,47 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
       ref={containerRef}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
-      className={`relative flex-1 h-full w-full min-h-0 min-w-0 bg-slate-950 overflow-hidden outline-none select-none ${
+      className={`relative flex-1 h-full w-full min-h-0 min-w-0 bg-slate-950 overflow-hidden outline-none select-none touch-none ${
         isPickFaceMode ? 'cursor-crosshair' : 'cursor-grab'
       }`}
     >
       {/* Top Floating Viewport Toolbar */}
-      <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1.5 shadow-xl text-xs">
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 flex items-center gap-1 sm:gap-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1 sm:p-1.5 shadow-xl text-xs max-w-[calc(100vw-1.5rem)] overflow-x-auto no-scrollbar">
         <button
           onClick={() => setView('iso')}
-          className="px-2.5 py-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium cursor-pointer"
+          className="px-2 sm:px-2.5 py-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium cursor-pointer shrink-0"
           title="Góc nhìn phối cảnh 3D Isometric"
         >
-          Isometric
+          ISO
         </button>
         <button
           onClick={() => setView('top')}
-          className="px-2.5 py-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium cursor-pointer"
+          className="px-2 sm:px-2.5 py-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium cursor-pointer shrink-0"
           title="Nhìn từ trên (Top View)"
         >
-          Trên (Top)
+          Trên
         </button>
         <button
           onClick={() => setView('front')}
-          className="px-2.5 py-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium cursor-pointer"
+          className="px-2 sm:px-2.5 py-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium cursor-pointer shrink-0"
           title="Nhìn chính diện (Front View)"
         >
-          Trước (Front)
+          Trước
         </button>
         <button
           onClick={() => setView('right')}
-          className="px-2.5 py-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium cursor-pointer"
+          className="px-2 sm:px-2.5 py-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium cursor-pointer shrink-0"
           title="Nhìn từ bên phải (Right View)"
         >
-          Cạnh (Side)
+          Cạnh
         </button>
 
-        <div className="w-[1px] h-4 bg-slate-700 mx-1" />
+        <div className="w-[1px] h-4 bg-slate-700 mx-0.5 sm:mx-1 shrink-0" />
 
         {/* Pick face mode button */}
         <button
           onClick={() => setIsPickFaceMode(!isPickFaceMode)}
-          className={`px-2.5 py-1 rounded-lg transition-colors font-semibold flex items-center gap-1.5 cursor-pointer ${
+          className={`px-2 sm:px-2.5 py-1 rounded-lg transition-colors font-semibold flex items-center gap-1 sm:gap-1.5 cursor-pointer shrink-0 ${
             isPickFaceMode
               ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm'
               : 'text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent'
@@ -450,14 +454,15 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
           title="Bật/Tắt chế độ Click trực tiếp lên bất kỳ mặt nào trên mô hình để căn hộp bao bám sát mặt đó"
         >
           <MousePointerClick className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Click chọn mặt ({isPickFaceMode ? 'Bật' : 'Tắt'})</span>
+          <span className="hidden sm:inline">Click chọn mặt ({isPickFaceMode ? 'Bật' : 'Tắt'})</span>
+          <span className="sm:hidden">Chọn mặt</span>
         </button>
 
-        <div className="w-[1px] h-4 bg-slate-700 mx-1" />
+        <div className="w-[1px] h-4 bg-slate-700 mx-0.5 sm:mx-1 shrink-0" />
 
         <button
           onClick={fitCameraToObject}
-          className="p-1.5 text-slate-300 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+          className="p-1 sm:p-1.5 text-slate-300 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shrink-0"
           title="Căn giữa mô hình (Fit view)"
         >
           <RotateCcw className="w-3.5 h-3.5" />
@@ -465,7 +470,7 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
 
         <button
           onClick={() => setAutoRotate(!autoRotate)}
-          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`p-1 sm:p-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
             autoRotate
               ? 'text-cyan-400 bg-cyan-950/60 border border-cyan-800'
               : 'text-slate-300 hover:text-white hover:bg-slate-800'
@@ -477,7 +482,7 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
 
         <button
           onClick={() => setShowDimensions(!showDimensions)}
-          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`p-1 sm:p-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
             showDimensions
               ? 'text-emerald-400 bg-emerald-950/60 border border-emerald-800'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
@@ -489,7 +494,7 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
 
         <button
           onClick={() => setShowGrid(!showGrid)}
-          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`p-1 sm:p-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
             showGrid
               ? 'text-cyan-400 bg-cyan-950/60 border border-cyan-800'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
@@ -501,7 +506,7 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
 
         <button
           onClick={takeScreenshot}
-          className="p-1.5 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+          className="p-1 sm:p-1.5 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shrink-0"
           title="Chụp ảnh màn hình 3D (PNG)"
         >
           <Camera className="w-3.5 h-3.5" />
@@ -509,7 +514,7 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
 
         <button
           onClick={toggleFullscreen}
-          className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+          className="p-1 sm:p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shrink-0"
           title="Toàn màn hình"
         >
           {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -517,50 +522,61 @@ export const Canvas3D: React.FC<Canvas3DProps> = ({
       </div>
 
       {/* Bottom Floating Dimension HUD Badge */}
-      <div className="absolute bottom-4 left-4 z-10 flex flex-wrap items-center gap-3 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl p-3 shadow-2xl text-xs max-w-[calc(100%-2rem)]">
-        {showOBB && (() => {
-          const currentOBB = activeOBB || model.obb;
-          const hasOffset = !!(activeOBB && (activeOBB.size.x !== model.obb.size.x || activeOBB.size.y !== model.obb.size.y || activeOBB.size.z !== model.obb.size.z));
-          return (
-            <div className={`flex items-center gap-2 ${showAABB ? 'pr-3 border-r border-slate-700/60' : ''}`}>
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
+      <div className="absolute bottom-3 left-3 right-3 sm:right-auto sm:bottom-4 sm:left-4 z-10 flex flex-col gap-2.5 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-2.5 sm:p-3 shadow-2xl text-xs max-w-[calc(100%-1.5rem)] sm:max-w-xl">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+          {showOBB && (() => {
+            const currentOBB = activeOBB || model.obb;
+            const hasOffset = !!(activeOBB && (activeOBB.size.x !== model.obb.size.x || activeOBB.size.y !== model.obb.size.y || activeOBB.size.z !== model.obb.size.z));
+            return (
+              <div className={`flex items-center gap-2 ${showAABB ? 'pr-2.5 sm:pr-3 border-r border-slate-700/60' : ''}`}>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981] shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-[9px] sm:text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <span>
+                      {hasOffset ? 'OBB BÙ TRỪ VÁCH' : 'OBB THÔNG MINH'}:
+                    </span>
+                  </span>
+                  <span className="font-mono text-white font-bold text-xs sm:text-sm">
+                    {formatDim(currentOBB.dimensions.length)} × {formatDim(currentOBB.dimensions.width)} × {formatDim(currentOBB.dimensions.height)} mm
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
+
+          {showAABB && (
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8] shrink-0" />
               <div className="flex flex-col">
-                <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <span>
-                    {hasOffset ? 'OBB VÁCH / KHAY TRAY (ĐÃ BÙ TRỪ OFFSET)' : 'OBB (PHỦ BÌ THÔNG MINH)'}:
-                  </span>
+                <span className="text-[9px] sm:text-[10px] text-sky-400 font-bold uppercase tracking-wider">
+                  AABB (Mặc định XYZ):
                 </span>
-                <span className="font-mono text-white font-bold">
-                  {formatDim(currentOBB.dimensions.length)} × {formatDim(currentOBB.dimensions.width)} × {formatDim(currentOBB.dimensions.height)} mm
+                <span className="font-mono text-white font-bold text-xs sm:text-sm">
+                  {formatDim(model.aabb.dimensions.length)} × {formatDim(model.aabb.dimensions.width)} × {formatDim(model.aabb.dimensions.height)} mm
                 </span>
-                {hasOffset && (
-                  <span className="text-[10px] text-slate-400 font-mono">
-                    Gốc: {formatDim(model.obb.dimensions.length)} × {formatDim(model.obb.dimensions.width)} × {formatDim(model.obb.dimensions.height)} mm
-                  </span>
-                )}
               </div>
             </div>
-          );
-        })()}
+          )}
 
-        {showAABB && (
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]" />
-            <div className="flex flex-col">
-              <span className="text-[10px] text-sky-400 font-bold uppercase tracking-wider">
-                AABB (Trục mặc định XYZ):
-              </span>
-              <span className="font-mono text-white font-bold">
-                {formatDim(model.aabb.dimensions.length)} × {formatDim(model.aabb.dimensions.width)} × {formatDim(model.aabb.dimensions.height)} mm
-              </span>
+          {!showOBB && !showAABB && (
+            <span className="text-slate-400 text-xs italic">
+              Cả 2 khung dây Bounding Box đang tắt. Bật trong bảng điều khiển để xem.
+            </span>
+          )}
+        </div>
+
+        {/* Mobile/Tablet button to open Sidebar Drawer */}
+        {onOpenSidebar && (
+          <button
+            onClick={onOpenSidebar}
+            className="lg:hidden w-full pt-2 border-t border-slate-700/60 flex items-center justify-between text-xs font-semibold text-emerald-400 hover:text-emerald-300 cursor-pointer active:opacity-75 transition-colors"
+          >
+            <div className="flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Chỉnh Bù Trừ Vách / Khay & Xuất CAD</span>
             </div>
-          </div>
-        )}
-
-        {!showOBB && !showAABB && (
-          <span className="text-slate-400 text-xs italic">
-            Cả 2 khung dây Bounding Box đang tắt. Bật trong thanh điều khiển bên phải để xem.
-          </span>
+            <ChevronRight className="w-4 h-4 text-emerald-400" />
+          </button>
         )}
       </div>
 

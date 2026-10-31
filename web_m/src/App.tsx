@@ -45,6 +45,9 @@ export const App: React.FC = () => {
   // Upload modal for replacing current model
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
 
+  // Mobile & Tablet Sidebar drawer state
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
+
   // Compute active OBB with applied face offsets in real-time
   const activeOBB = useMemo(() => {
     if (!model?.obb) return null;
@@ -171,6 +174,7 @@ export const App: React.FC = () => {
     setOffsets(DEFAULT_OFFSETS);
     setParseStatus('idle');
     setErrorMessage(null);
+    setMobileSidebarOpen(false);
   };
 
   // Real-time angle / strategy change
@@ -249,6 +253,8 @@ export const App: React.FC = () => {
         onLoadSample={() => handleLoadSample('/sample_bracket.step')}
         onOpenUpload={() => setShowUploadModal(true)}
         isLoading={isLoading}
+        onToggleSidebar={() => setMobileSidebarOpen((prev) => !prev)}
+        sidebarOpen={mobileSidebarOpen}
       />
 
       <main className="flex-1 flex min-h-0 min-w-0 overflow-hidden relative">
@@ -272,7 +278,7 @@ export const App: React.FC = () => {
             errorMessage={errorMessage}
           />
         ) : (
-          <div className="flex-1 flex w-full h-full min-h-0 min-w-0 overflow-hidden">
+          <div className="flex-1 flex w-full h-full min-h-0 min-w-0 overflow-hidden relative">
             <Canvas3D
               model={model}
               activeOBB={activeOBB}
@@ -284,7 +290,16 @@ export const App: React.FC = () => {
               showDimensions={showDimensions}
               setShowDimensions={setShowDimensions}
               onFacePicked={(normal) => handleSelectFace(normal, null)}
+              onOpenSidebar={() => setMobileSidebarOpen(true)}
             />
+
+            {/* Mobile / Tablet Backdrop */}
+            {mobileSidebarOpen && (
+              <div
+                onClick={() => setMobileSidebarOpen(false)}
+                className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 lg:hidden cursor-pointer transition-opacity"
+              />
+            )}
 
             <Sidebar
               model={model}
@@ -310,6 +325,8 @@ export const App: React.FC = () => {
               onExportOBJ={handleExportOBJ}
               onExportGLTF={handleExportGLTF}
               onExportJSON={handleExportJSON}
+              isOpen={mobileSidebarOpen}
+              onClose={() => setMobileSidebarOpen(false)}
             />
           </div>
         )}
